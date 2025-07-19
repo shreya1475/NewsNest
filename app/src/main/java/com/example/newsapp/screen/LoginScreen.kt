@@ -1,5 +1,6 @@
 package com.example.newsapp.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import com.example.newsapp.util.*
 
 @Composable
 fun LoginScreen(
@@ -155,18 +158,32 @@ fun LoginScreen(
 
 
             // Login Button
+            // Add a loading state
+            var loading by remember { mutableStateOf(false) }
+            val context = LocalContext.current
+
             Button(
                 onClick = {
-                    if (
-                        field1 == "demo.wordpress.com" &&
-                        field2 == "demo@wordpress.com" &&
-                        password == "1234"
-                    ) {
-                        onLoginSuccess()
-                    } else {
-                        // TODO: show error message
-                    }
+                    loading = true
+
+                    val formattedUrl = formatUrl(field1)
+
+                    loginUser(
+                        context = context,
+                        baseUrl = formattedUrl,
+                        username = field2,
+                        password = password,
+                        onSuccess = { token ->
+                            loading = false
+                            onLoginSuccess()
+                        },
+                        onError = { errorMsg ->
+                            loading = false
+                            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                        }
+                    )
                 },
+                enabled = !loading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
@@ -176,7 +193,15 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             ) {
-                Text("Login", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                if (loading) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Login", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
             }
         }
     }

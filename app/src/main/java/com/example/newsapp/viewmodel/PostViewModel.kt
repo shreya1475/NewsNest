@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class PostsViewModel : ViewModel() {
-    private val api = WordPressApiService.create()
+class PostsViewModel(token: String, baseUrl: String) : ViewModel() {
+    private val api = WordPressApiService.create(baseUrl, token)
 
     private val _posts = MutableStateFlow<List<WordPressPost>>(emptyList())
     val posts: StateFlow<List<WordPressPost>> = _posts
