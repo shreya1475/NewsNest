@@ -36,7 +36,6 @@ fun PostEditorScreen() {
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
     val density = LocalDensity.current
-
     var keyboardHeightDp by remember { mutableStateOf(0.dp) }
 
     val context = LocalContext.current
@@ -89,7 +88,6 @@ fun PostEditorScreen() {
                                 val username = "shreya"
                                 val appPassword = "nFjS 32y2 u4hm rQPn 3N0j EFYn"
 
-
                                 uploadPostToWordPress(
                                     context = context,
                                     username = username,
@@ -100,7 +98,6 @@ fun PostEditorScreen() {
                                     onSuccess = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() },
                                     onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
                                 )
-
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
