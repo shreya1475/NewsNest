@@ -1,5 +1,11 @@
 package com.example.newsapp.screen
 
+import android.graphics.Rect
+import android.net.Uri
+import android.view.ViewTreeObserver
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,21 +14,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.*
-import android.graphics.Rect
-import android.view.ViewTreeObserver
-import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.newsapp.utils.uploadPostToWordPress
+import kotlinx.coroutines.launch
 
 @Composable
 fun PostEditorScreen() {
@@ -32,9 +36,15 @@ fun PostEditorScreen() {
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
     val density = LocalDensity.current
-
-    // Listen to keyboard height
     var keyboardHeightDp by remember { mutableStateOf(0.dp) }
+
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+        selectedImageUri = it
+    }
 
     DisposableEffect(view) {
         val listener = ViewTreeObserver.OnGlobalLayoutListener {
@@ -42,17 +52,14 @@ fun PostEditorScreen() {
             view.getWindowVisibleDisplayFrame(rect)
             val screenHeight = view.rootView.height
             val keyboardHeightPx = screenHeight - rect.bottom
-
             keyboardHeightDp = with(density) { keyboardHeightPx.toDp() }
         }
 
         view.viewTreeObserver.addOnGlobalLayoutListener(listener)
-
         onDispose {
             view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
         }
     }
-
 
     Box(
         modifier = Modifier
@@ -60,10 +67,8 @@ fun PostEditorScreen() {
             .background(Color.Black)
             .padding(top = 38.dp, start = 16.dp, end = 16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
             // Top bar
             Row(
                 modifier = Modifier
@@ -72,12 +77,29 @@ fun PostEditorScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* back */ }) {
+                IconButton(onClick = { /* TODO: Handle back */ }) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
+
                 Row {
                     Button(
-                        onClick = { /* publish */ },
+                        onClick = {
+                            coroutineScope.launch {
+                                val username = "shreya"
+                                val appPassword = "nFjS 32y2 u4hm rQPn 3N0j EFYn"
+
+                                uploadPostToWordPress(
+                                    context = context,
+                                    username = username,
+                                    appPassword = appPassword,
+                                    title = title,
+                                    content = content,
+                                    imageUri = selectedImageUri,
+                                    onSuccess = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() },
+                                    onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
+                                )
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Black,
                             contentColor = Color.White
@@ -88,7 +110,8 @@ fun PostEditorScreen() {
                     ) {
                         Text("Publish", fontSize = 16.sp)
                     }
-                    IconButton(onClick = { /* more */ }) {
+
+                    IconButton(onClick = { /* TODO: Handle more */ }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More", tint = Color.White)
                     }
                 }
@@ -121,8 +144,7 @@ fun PostEditorScreen() {
                 onValueChange = { content = it },
                 textStyle = TextStyle(color = Color.White, fontSize = 18.sp, lineHeight = 28.sp),
                 cursorBrush = SolidColor(Color.White.copy(alpha = 0.6f)),
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 decorationBox = { innerTextField ->
                     if (content.isEmpty()) {
                         Text("Start writing...", color = Color.Gray, fontSize = 18.sp)
@@ -132,15 +154,15 @@ fun PostEditorScreen() {
             )
         }
 
-        // Floating Add Image Button (appears above keyboard)
+        // Floating Add Image Button (above keyboard)
         FloatingActionButton(
-            onClick = { /* open gallery or image picker */ },
+            onClick = { launcher.launch("image/*") },
             containerColor = Color.DarkGray,
             contentColor = Color.White,
             shape = RoundedCornerShape(50),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = keyboardHeightDp + 16.dp) // shifts up above keyboard
+                .padding(end = 16.dp, bottom = keyboardHeightDp + 16.dp)
         ) {
             Icon(Icons.Default.AddPhotoAlternate, contentDescription = "Add Image")
         }
