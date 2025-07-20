@@ -32,7 +32,14 @@ import androidx.compose.ui.unit.sp
 import com.example.newsapp.R
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    onEditProfile: () -> Unit = {},
+    onReAuth: () -> Unit = {},
+    onNotificationSettings: () -> Unit = {},
+    onNewsletterSettings: () -> Unit = {},
+    onAppPreferences: () -> Unit = {},
+    onLogout: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()

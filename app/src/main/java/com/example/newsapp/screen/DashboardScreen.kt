@@ -24,9 +24,12 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.newsapp.model.WordPressPost
 import com.example.newsapp.viewmodel.PostsViewModel
+import com.example.newsapp.viewmodel.PostsViewModelFactory
 
 @Composable
 fun DashboardScreen(
+    token: String,
+    baseUrl: String,
     publishedToday: Int = 5,
     totalPosts: Int = 105,
     drafts: Int = 3,
@@ -36,9 +39,10 @@ fun DashboardScreen(
     navController: NavHostController,
     onAnalyticsClick: () -> Unit = {},
     onManageClick: () -> Unit = {},
-    viewModel: PostsViewModel = viewModel(),
     onFabClick: () -> Unit = {}
 ) {
+    val factory = remember { PostsViewModelFactory(token, baseUrl) }
+    val viewModel: PostsViewModel = viewModel(factory = factory)
     val posts by viewModel.posts.collectAsState()
 
     Box(
@@ -119,7 +123,7 @@ fun DashboardScreen(
 
             LazyColumn {
                 items(posts) { post ->
-                    WordPressPostItem(post)
+                    WordPressPostItem(post, viewModel)
                 }
             }
         }
@@ -189,7 +193,7 @@ fun MetricItem(label: String, value: String) {
 }
 
 @Composable
-fun WordPressPostItem(post: WordPressPost, viewModel: PostsViewModel = viewModel()) {
+fun WordPressPostItem(post: WordPressPost, viewModel: PostsViewModel) {
     var authorName by remember { mutableStateOf("Loading...") }
     var imageUrl by remember { mutableStateOf<String?>(null) }
 

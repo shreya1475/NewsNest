@@ -26,7 +26,7 @@ import com.example.newsapp.util.*
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit = {}
+    onLoginSuccess: (String, String) -> Unit // token, baseUrl
 ) {
     var field1 by remember { mutableStateOf("") }
     var field2 by remember { mutableStateOf("") }
@@ -175,7 +175,7 @@ fun LoginScreen(
                         password = password,
                         onSuccess = { token ->
                             loading = false
-                            onLoginSuccess()
+                            onLoginSuccess(token, formattedUrl)
                         },
                         onError = { errorMsg ->
                             loading = false
