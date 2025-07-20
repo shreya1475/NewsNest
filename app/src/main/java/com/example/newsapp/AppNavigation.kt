@@ -1,10 +1,18 @@
 package com.example.newsapp
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.newsapp.reader.PostDetailScreen
+import com.example.newsapp.reader.PostViewModel
+import com.example.newsapp.reader.ReaderScreenWrapper
 import com.example.newsapp.screen.AnalyticsScreen
 import com.example.newsapp.screen.DashboardScreen
 import com.example.newsapp.screen.LoginScreen
@@ -25,6 +33,9 @@ fun AppNavigation() {
             WelcomeScreen(
                 onLoginClick = {
                     navController.navigate("login")
+                },
+                onContinueAsReader = {
+                    navController.navigate("reader")
                 }
             )
         }
@@ -39,6 +50,24 @@ fun AppNavigation() {
                 }
             )
         }
+
+        composable("reader") {
+            ReaderScreenWrapper(navController)
+        }
+
+        composable(
+            route = "detail/{index}",
+            arguments = listOf(navArgument("index") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val index = backStackEntry.arguments?.getInt("index") ?: 0
+            val viewModel: PostViewModel = viewModel()
+            val posts by viewModel.posts.collectAsState()
+
+            posts.getOrNull(index)?.let { post ->
+                PostDetailScreen(post = post)
+            }
+        }
+
 
 
         composable("dashboard/{token}/{baseUrl}") { backStackEntry ->

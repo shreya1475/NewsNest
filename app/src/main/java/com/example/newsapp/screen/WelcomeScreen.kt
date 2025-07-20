@@ -29,7 +29,8 @@ import com.example.newsapp.R
 
 @Composable
 fun WelcomeScreen(
-    onLoginClick: () -> Unit = {}
+    onLoginClick: () -> Unit = {},
+    onContinueAsReader: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -86,7 +87,7 @@ fun WelcomeScreen(
                 }
 
                 Button(
-                    onClick = onLoginClick,
+                    onClick = onContinueAsReader,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color.Black
