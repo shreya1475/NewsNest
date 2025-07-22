@@ -25,11 +25,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.newsapp.utils.uploadPostToWordPress
 import kotlinx.coroutines.launch
 
 @Composable
-fun PostEditorScreen() {
+fun PostEditorScreen(navController: NavController) {
     var title by remember { mutableStateOf("") }
     var content by remember { mutableStateOf("") }
 
@@ -95,7 +96,18 @@ fun PostEditorScreen() {
                                     title = title,
                                     content = content,
                                     imageUri = selectedImageUri,
-                                    onSuccess = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() },
+                                    onSuccess = { actualPostUrl ->
+                                        Toast.makeText(context, "Posted successfully", Toast.LENGTH_LONG).show()
+
+                                        navController.navigate(
+                                            "post_share_screen?" +
+                                                    "title=${Uri.encode(title)}&" +
+                                                    "content=${Uri.encode(content)}&" +
+                                                    "imageUri=${selectedImageUri}&" +
+                                                    "url=${Uri.encode(actualPostUrl)}"
+                                        )
+                                    }
+                                    ,
                                     onError = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() }
                                 )
                             }

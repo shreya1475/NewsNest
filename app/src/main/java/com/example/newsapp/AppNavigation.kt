@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import com.example.newsapp.screen.AnalyticsScreen
 import com.example.newsapp.screen.DashboardScreen
 import com.example.newsapp.screen.LoginScreen
 import com.example.newsapp.screen.PostEditorScreen
+import com.example.newsapp.screen.PostShareScreen
 import com.example.newsapp.screen.ProfileScreen
 import com.example.newsapp.screen.WelcomeScreen
 import java.net.URLDecoder
@@ -94,7 +96,7 @@ fun AppNavigation() {
             )
         }
         composable("editor") {
-            PostEditorScreen()
+            PostEditorScreen(navController = navController)
         }
 
 
@@ -112,5 +114,33 @@ fun AppNavigation() {
                 }
             )
         }
+
+        composable(
+            route = "post_share_screen?title={title}&content={content}&imageUri={imageUri}&url={url}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("content") { type = NavType.StringType },
+                navArgument("imageUri") { nullable = true; type = NavType.StringType },
+                navArgument("url") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title") ?: ""
+            val content = backStackEntry.arguments?.getString("content") ?: ""
+            val imageUriStr = backStackEntry.arguments?.getString("imageUri")
+            val postUrl = backStackEntry.arguments?.getString("url") ?: ""
+
+            val decodedTitle = URLDecoder.decode(title, StandardCharsets.UTF_8.toString())
+            val decodedContent = URLDecoder.decode(content, StandardCharsets.UTF_8.toString())
+            val decodedUrl = URLDecoder.decode(postUrl, StandardCharsets.UTF_8.toString())
+            val imageUri = imageUriStr?.let { Uri.parse(it) }
+
+            PostShareScreen(
+                title = decodedTitle,
+                content = decodedContent,
+                imageUri = imageUri,
+                postUrl = decodedUrl
+            )
+        }
+
     }
 }
