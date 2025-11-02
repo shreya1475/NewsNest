@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object PostUploadRetrofit {
     val apiService: PostUploadApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("https://blogpost.kesug.com/")
+            .baseUrl("https://blogpost.infinityfreeapp.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(PostUploadApiService::class.java)

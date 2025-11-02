@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://blogpost.kesug.com/wp-json/wp/v2/"
+    private const val BASE_URL = "https://blogpost.infinityfreeapp.com/wp-json/wp/v2/"
 
     // Replace with your actual WP username and App Password (no spaces)
     private const val username = "shreya"

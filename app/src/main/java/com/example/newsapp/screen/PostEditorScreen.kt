@@ -87,7 +87,7 @@ fun PostEditorScreen(navController: NavController) {
                         onClick = {
                             coroutineScope.launch {
                                 val username = "shreya"
-                                val appPassword = "nFjS 32y2 u4hm rQPn 3N0j EFYn"
+                                val appPassword = "MrRL tRNQ ZRkc qmP7 o4O3 Uvxt"
 
                                 uploadPostToWordPress(
                                     context = context,

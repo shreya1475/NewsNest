@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 
 interface WordPressAuthService {
     @FormUrlEncoded
-    @POST("wp-json/jwt-auth/v1/token")
+    @POST("jwt-auth/v1/token")
     suspend fun login(
         @Field("username") username: String,
         @Field("password") password: String
